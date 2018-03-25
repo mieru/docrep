@@ -1,10 +1,3 @@
-/**
- * $RCSfile: ValidatorComponent.java,v $
- * $Revision: 1.3 $
- * $Date: 2017/11/29 12:22:19 $
- * $Source: /CVS/java/mu/src/pl/com/altar/mu/springapp/component/ValidatorComponent.java,v $
- * $Author: grzesf $
- */
 package docrep.component;
 
 import java.util.Set;
