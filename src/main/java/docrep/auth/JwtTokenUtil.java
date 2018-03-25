@@ -15,7 +15,7 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 
 @Service
 public class JwtTokenUtil {
-    private static final String USER_ID_CLAIM = "userId";
+    private static final String USERNAME_CLAIM = "username";
     private static final String SECRED_KEY = "docrep-cezary-miernik-2018-psk";
 
     private Algorithm algorithm = null;
@@ -24,9 +24,9 @@ public class JwtTokenUtil {
         algorithm = Algorithm.HMAC256(Base64.getEncoder().encodeToString(SECRED_KEY.getBytes()));
     }
 
-    public String generateToken() {
+    public String generateToken(String username) {
         JWTCreator.Builder jwtBuilder = JWT.create();
-        return jwtBuilder.sign(algorithm);
+        return jwtBuilder.withClaim(USERNAME_CLAIM, username).sign(algorithm);
     }
 
     public DecodedJWT validateToken(String token) {
@@ -44,11 +44,8 @@ public class JwtTokenUtil {
         return decodedJWT;
     }
 
-    public Integer getUserIdFormToken(DecodedJWT decodedJWT) {
-        String value = decodedJWT.getClaim(USER_ID_CLAIM).asString();
-        if (value != null && !value.isEmpty())
-            return Integer.valueOf(value);
-        return null;
+    public String getUsernameFromToken(DecodedJWT decodedJWT) {
+        return decodedJWT.getClaim(USERNAME_CLAIM).asString();
     }
 
 

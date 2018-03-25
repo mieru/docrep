@@ -127,16 +127,4 @@ public class DocumentDao extends DAOImpl<DocumentRecord, docrep.db.tables.pojos.
     public List<docrep.db.tables.pojos.Document> fetchByEditDate(Timestamp... values) {
         return fetch(Document.DOCUMENT.EDIT_DATE, values);
     }
-
-    /**
-     * Fetch records that have <code>ft IN (values)</code>
-     */
-
-    /**
-     * @deprecated Unknown data type. Please define an explicit {@link org.jooq.Binding} to specify how this type should be handled.
-     */
-    @java.lang.Deprecated
-    public List<docrep.db.tables.pojos.Document> fetchByFt(Object... values) {
-        return fetch(Document.DOCUMENT.FT, values);
-    }
 }

@@ -1,7 +1,11 @@
 package docrep.service.storagelocation;
 
 import docrep.component.ValidatorComponent;
+import docrep.db.tables.daos.AccountDao;
+import docrep.db.tables.daos.PersonDao;
 import docrep.db.tables.daos.StorageLocationDao;
+import docrep.db.tables.pojos.Account;
+import docrep.db.tables.pojos.Person;
 import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
 import docrep.service.storagelocation.dto.StorageLocationDTO;
@@ -12,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
+import java.util.List;
 
 @Service
 public class StorageLocationService {
@@ -19,6 +24,8 @@ public class StorageLocationService {
 
     @Autowired
     StorageLocationDao storageLocationDao;
+    @Autowired
+    PersonDao personDao;
     @Autowired
     ValidatorComponent validatorComponent;
 
@@ -75,4 +82,23 @@ public class StorageLocationService {
             throw new ValidationException("AccountId cannot be null when type is Employee");
         }
     }
+
+
+    @Transactional
+    public StorageLocation findOrAddStorageLocationByAccount(Account account) {
+            StorageLocation storageLocation = null;
+            List<StorageLocation> storageLocations = storageLocationDao.fetchByAccountId(account.getId());
+            if (storageLocations == null || storageLocations.isEmpty()) {
+                StorageLocation storageLocationToAdd = new StorageLocation();
+                storageLocationToAdd.setType(StorageLocationType.EMPLOYEE.toString());
+                storageLocationToAdd.setAccountId(account.getId());
+                Person person = personDao.fetchOneById(account.getPersonId());
+                storageLocationToAdd.setName(person.getFirstname() + " " + person.getLastname());
+                storageLocationDao.insert(storageLocationToAdd);
+                storageLocation = storageLocationToAdd;
+            } else {
+                storageLocation = storageLocations.get(0);
+            }
+            return storageLocation;
+        }
 }

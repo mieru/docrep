@@ -40,7 +40,6 @@ public class Indexes {
     public static final Index ADDRESS_PKEY = Indexes0.ADDRESS_PKEY;
     public static final Index CONTACT_PKEY = Indexes0.CONTACT_PKEY;
     public static final Index DOCUMENT_PKEY = Indexes0.DOCUMENT_PKEY;
-    public static final Index TSEARCH_DOCUMENT = Indexes0.TSEARCH_DOCUMENT;
     public static final Index PERSON_PKEY = Indexes0.PERSON_PKEY;
     public static final Index STORAGE_LOCATION_PKEY = Indexes0.STORAGE_LOCATION_PKEY;
 
@@ -54,7 +53,6 @@ public class Indexes {
         public static Index ADDRESS_PKEY = createIndex("address_pkey", Address.ADDRESS, new OrderField[] { Address.ADDRESS.ID }, true);
         public static Index CONTACT_PKEY = createIndex("contact_pkey", Contact.CONTACT, new OrderField[] { Contact.CONTACT.ID }, true);
         public static Index DOCUMENT_PKEY = createIndex("document_pkey", Document.DOCUMENT, new OrderField[] { Document.DOCUMENT.ID }, true);
-        public static Index TSEARCH_DOCUMENT = createIndex("tsearch_document", Document.DOCUMENT, new OrderField[] { Document.DOCUMENT.FT }, false);
         public static Index PERSON_PKEY = createIndex("person_pkey", Person.PERSON, new OrderField[] { Person.PERSON.ID }, true);
         public static Index STORAGE_LOCATION_PKEY = createIndex("storage_location_pkey", StorageLocation.STORAGE_LOCATION, new OrderField[] { StorageLocation.STORAGE_LOCATION.ID }, true);
     }

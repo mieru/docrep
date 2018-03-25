@@ -33,7 +33,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
         DecodedJWT decodedJWT = jwtAuthenticationToken.getDecodedJWT();
 
         JwtAuthenticatedUser jwtAuthenticatedUser = new JwtAuthenticatedUser();
-        jwtAuthenticatedUser.setId(jwtTokenUtil.getUserIdFormToken(decodedJWT));
+        jwtAuthenticatedUser.setUsername(jwtTokenUtil.getUsernameFromToken(decodedJWT));
 
         return jwtAuthenticatedUser;
     }

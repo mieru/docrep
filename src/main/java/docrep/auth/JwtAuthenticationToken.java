@@ -36,7 +36,7 @@ public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken 
 
     @Override
     public Object getPrincipal() {
-        return null;
+        return decodedJWT.getClaim("username");
     }
 }
 

@@ -1,21 +1,29 @@
 package docrep.service.document.mapper;
 
 import docrep.db.tables.pojos.Document;
+import docrep.db.tables.pojos.Person;
+import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.document.dto.DocumentDTO;
+import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
 
 public class DocumentMapper {
-    public static DocumentDTO mapDocumentToDocumentDTO(Document document) {
+
+
+
+
+    public static DocumentDTO mapDocumentToDocumentDTO(Document document, Person person, CompleteStorageLocationStructureDTO storageLocation) {
+
         return DocumentDTO.builder()
                 .id(document.getId())
-                .ownerId(document.getOwnerId())
+                .lastModifier(person)
                 .barcode(document.getBarcode())
                 .description(document.getDescription())
                 .number(document.getNumber())
                 .title(document.getTitle())
-                .editDate(document.getEditDate() != null ? document.getEditDate().toLocalDateTime() : null)
-                .registerDate(document.getRegisterDate() != null ? document.getRegisterDate().toLocalDateTime() : null)
+                .editDate(document.getEditDate() != null ? document.getEditDate() : null)
+                .registerDate(document.getRegisterDate() != null ? document.getRegisterDate() : null)
                 .version(document.getVersion())
-                .storageLocationId(document.getStorageLocationId())
+                .storageLocation(storageLocation)
                 .build();
     }
 }

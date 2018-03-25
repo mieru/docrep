@@ -42,7 +42,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Document extends TableImpl<DocumentRecord> {
 
-    private static final long serialVersionUID = 2017994801;
+    private static final long serialVersionUID = -1746349582;
 
     /**
      * The reference instance of <code>public.document</code>
@@ -108,12 +108,6 @@ public class Document extends TableImpl<DocumentRecord> {
     public final TableField<DocumentRecord, Timestamp> EDIT_DATE = createField("edit_date", org.jooq.impl.SQLDataType.TIMESTAMP, this, "", new DateAsTimestampBinding());
 
     /**
-     * @deprecated Unknown data type. Please define an explicit {@link org.jooq.Binding} to specify how this type should be handled.
-     */
-    @java.lang.Deprecated
-    public final TableField<DocumentRecord, Object> FT = createField("ft", org.jooq.impl.DefaultDataType.getDefaultDataType("tsvector"), this, "");
-
-    /**
      * Create a <code>public.document</code> table reference
      */
     public Document() {
@@ -155,7 +149,7 @@ public class Document extends TableImpl<DocumentRecord> {
      */
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.DOCUMENT_PKEY, Indexes.TSEARCH_DOCUMENT);
+        return Arrays.<Index>asList(Indexes.DOCUMENT_PKEY);
     }
 
     /**

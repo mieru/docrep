@@ -23,7 +23,7 @@ import javax.annotation.Generated;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Document implements Serializable {
 
-    private static final long serialVersionUID = 1953632359;
+    private static final long serialVersionUID = -1829528645;
 
     private Integer   id;
     private String    number;
@@ -35,7 +35,6 @@ public class Document implements Serializable {
     private String    description;
     private Integer   version;
     private Timestamp editDate;
-    private Object    ft;
 
     public Document() {}
 
@@ -50,7 +49,6 @@ public class Document implements Serializable {
         this.description = value.description;
         this.version = value.version;
         this.editDate = value.editDate;
-        this.ft = value.ft;
     }
 
     public Document(
@@ -63,8 +61,7 @@ public class Document implements Serializable {
         Integer   ownerId,
         String    description,
         Integer   version,
-        Timestamp editDate,
-        Object    ft
+        Timestamp editDate
     ) {
         this.id = id;
         this.number = number;
@@ -76,7 +73,6 @@ public class Document implements Serializable {
         this.description = description;
         this.version = version;
         this.editDate = editDate;
-        this.ft = ft;
     }
 
     public Integer getId() {
@@ -159,24 +155,6 @@ public class Document implements Serializable {
         this.editDate = editDate;
     }
 
-
-    /**
-     * @deprecated Unknown data type. Please define an explicit {@link org.jooq.Binding} to specify how this type should be handled.
-     */
-    @java.lang.Deprecated
-    public Object getFt() {
-        return this.ft;
-    }
-
-
-    /**
-     * @deprecated Unknown data type. Please define an explicit {@link org.jooq.Binding} to specify how this type should be handled.
-     */
-    @java.lang.Deprecated
-    public void setFt(Object ft) {
-        this.ft = ft;
-    }
-
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Document (");
@@ -191,7 +169,6 @@ public class Document implements Serializable {
         sb.append(", ").append(description);
         sb.append(", ").append(version);
         sb.append(", ").append(editDate);
-        sb.append(", ").append(ft);
 
         sb.append(")");
         return sb.toString();

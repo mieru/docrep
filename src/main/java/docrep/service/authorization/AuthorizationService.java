@@ -16,6 +16,7 @@ import docrep.service.contact.dto.ContactDTO;
 import docrep.service.contact.mapper.ContactMapper;
 import docrep.service.person.mapper.PersonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +27,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+
 public class AuthorizationService {
 
     @Autowired
@@ -50,7 +52,7 @@ public class AuthorizationService {
         try {
             validatorComponent.valid(authAccountDTO);
             Account account = accountDao.fetchOneByUsername(authAccountDTO.getUsername());
-            return account.getStatus().equals("ACTIVE") ? bCryptPasswordEncoder.matches(authAccountDTO.getPassword(), account.getPassword()) : false;
+            return account != null && "ACTIVE".equals(account.getStatus()) ? bCryptPasswordEncoder.matches(authAccountDTO.getPassword(), account.getPassword()) : false;
         } catch (ValidationException e) {
             return false;
         }

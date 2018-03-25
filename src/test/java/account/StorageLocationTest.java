@@ -1,6 +1,7 @@
 package account;
 
 import docrep.component.ValidatorComponent;
+import docrep.db.tables.daos.PersonDao;
 import docrep.db.tables.daos.StorageLocationDao;
 import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.storagelocation.StorageLocationService;
@@ -49,6 +50,8 @@ public class StorageLocationTest {
 
     @MockBean
     StorageLocationDao storageLocationDao;
+    @MockBean
+    PersonDao personDao;
 
 
     @Test(expected = ValidationException.class)
