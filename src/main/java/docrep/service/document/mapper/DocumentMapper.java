@@ -20,8 +20,8 @@ public class DocumentMapper {
                 .description(document.getDescription())
                 .number(document.getNumber())
                 .title(document.getTitle())
-                .editDate(document.getEditDate() != null ? document.getEditDate() : null)
-                .registerDate(document.getRegisterDate() != null ? document.getRegisterDate() : null)
+                .editDate(document.getEditDate() != null ? document.getEditDate().toLocalDateTime().toLocalDate() : null)
+                .registerDate(document.getRegisterDate() != null ? document.getRegisterDate().toLocalDateTime().toLocalDate() : null)
                 .version(document.getVersion())
                 .storageLocation(storageLocation)
                 .build();

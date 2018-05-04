@@ -1,7 +1,6 @@
 package docrep.service.document;
 
 import docrep.auth.JwtAuthenticatedUser;
-import docrep.auth.JwtAuthenticationToken;
 import docrep.component.DocumentSessionStoreComponent;
 import docrep.component.ValidatorComponent;
 import docrep.dao.document.DocumentDAO;
@@ -18,13 +17,10 @@ import docrep.service.storagelocation.StorageLocationService;
 import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -46,7 +42,11 @@ public class DocumentService {
 
     public Collection<DocumentDTO> searchDocuments(DocumentSearchDTO documentSearchDTO) throws Exception {
         validatorComponent.valid(documentSearchDTO);
-        if (documentSearchDTO.areAllFieldsNull()) throw new Exception("All search fields are null.");
+        if (documentSearchDTO.areAllFieldsNull()) throw new RuntimeException("All search fields are null.");
+       return searchAll(documentSearchDTO);
+    }
+
+    public Collection<DocumentDTO> searchAll(DocumentSearchDTO documentSearchDTO) throws Exception {
         return documentDAO.search(documentSearchDTO).stream()
                 .map(document -> {
                     Account account = null;
@@ -84,5 +84,25 @@ public class DocumentService {
         document.setOwnerId(account.getId());
         document.setStorageLocationId(storageLocation.getId());
         documentDAO.update(document);
+    }
+
+    public Collection<DocumentDTO> searchFuzzy(String searchPhrase) {
+        if (searchPhrase == null) throw new RuntimeException("searchPhrase is null.");
+
+      return documentDAO.searchFuzzy(searchPhrase).stream()
+                .map(document -> {
+                    Account account = null;
+                    Person person = null;
+                    CompleteStorageLocationStructureDTO storageLocation = null;
+                    try {
+                        account = accountDao.fetchOneById(document.getOwnerId());
+                        person = personDao.fetchOneById(account.getPersonId());
+                        storageLocation = storageLocationService.getCompleteStructureStorageLocationById(document.getStorageLocationId());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    return DocumentMapper.mapDocumentToDocumentDTO(document, person, storageLocation);
+                })
+                .collect(Collectors.toList());
     }
 }

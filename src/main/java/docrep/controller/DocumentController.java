@@ -6,10 +6,7 @@ import docrep.service.document.dto.DocumentSearchDTO;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 
@@ -24,6 +21,16 @@ public class DocumentController {
     @RequestMapping(value = "/document/search", method = RequestMethod.POST)
     public Collection<DocumentDTO> searchDocuments(@RequestBody DocumentSearchDTO documentSearchDTO) throws Exception {
         return documentService.searchDocuments(documentSearchDTO);
+    }
+
+    @RequestMapping(value = "/document/search/all", method = RequestMethod.POST)
+    public Collection<DocumentDTO> searchAll(@RequestBody DocumentSearchDTO documentSearchDTO) throws Exception {
+        return documentService.searchAll(documentSearchDTO);
+    }
+
+    @RequestMapping(value = "/document/search/fuzzy/{searchPhrase}", method = RequestMethod.GET)
+    public Collection<DocumentDTO> searchAll(@PathVariable String searchPhrase) throws Exception {
+        return documentService.searchFuzzy(searchPhrase);
     }
 
     @RequestMapping(value = "/document/clipboard", method = RequestMethod.POST)
