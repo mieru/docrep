@@ -36,4 +36,11 @@ public class DocumentDAO extends DocumentDao {
                 .fetch()
                 .map(mapper());
     }
+
+    public Integer maxDocumentId() {
+       return super.configuration().dsl()
+                .select(DOCUMENT.ID.max())
+                .from(DOCUMENT)
+                .fetchOne().value1();
+    }
 }
