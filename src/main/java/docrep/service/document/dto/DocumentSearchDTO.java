@@ -5,6 +5,7 @@ import lombok.Data;
 
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Data
 @Builder
@@ -13,8 +14,8 @@ public class DocumentSearchDTO {
     private String title;
     private String barcode;
     private String description;
-    private LocalDate searchDateFrom;
-    private LocalDate searchDateTo;
+    private Date searchDateFrom;
+    private Date searchDateTo;
     private Integer ownerId;
     private Integer holderUserId;
 

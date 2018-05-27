@@ -6,6 +6,8 @@ import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.document.dto.DocumentDTO;
 import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
 
+import java.util.Date;
+
 public class DocumentMapper {
 
 
@@ -20,8 +22,9 @@ public class DocumentMapper {
                 .description(document.getDescription())
                 .number(document.getNumber())
                 .title(document.getTitle())
-                .editDate(document.getEditDate() != null ? document.getEditDate().toLocalDateTime().toLocalDate() : null)
-                .registerDate(document.getRegisterDate() != null ? document.getRegisterDate().toLocalDateTime().toLocalDate() : null)
+                .creator(person)
+                .editDate(document.getEditDate())
+                .registerDate(document.getRegisterDate())
                 .version(document.getVersion())
                 .storageLocation(storageLocation)
                 .build();

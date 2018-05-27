@@ -6,6 +6,7 @@ import docrep.service.document.dto.DocumentSearchDTO;
 import org.jooq.Configuration;
 import org.jooq.impl.DSL;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +25,8 @@ public class DocumentDAO extends DocumentDao {
                         ,documentSearchDTO.getTitle() != null ? DOCUMENT.TITLE.eq(documentSearchDTO.getTitle()) : DSL.trueCondition()
                         ,documentSearchDTO.getDescription() != null ? DOCUMENT.DESCRIPTION.eq(documentSearchDTO.getDescription()) : DSL.trueCondition()
                         ,documentSearchDTO.getOwnerId() != null ? DOCUMENT.OWNER_ID.eq(documentSearchDTO.getOwnerId()) : DSL.trueCondition()
+                        ,documentSearchDTO.getSearchDateFrom() != null ? DOCUMENT.REGISTER_DATE.ge(new Timestamp(documentSearchDTO.getSearchDateFrom().getTime())) : DSL.trueCondition()
+                        ,documentSearchDTO.getSearchDateTo() != null ? DOCUMENT.REGISTER_DATE.le(new Timestamp(documentSearchDTO.getSearchDateTo().getTime())) : DSL.trueCondition()
                         ,documentSearchDTO.getNumber() != null ? DOCUMENT.NUMBER.eq(documentSearchDTO.getNumber()) : DSL.trueCondition())
                 .fetch()
                 .map(mapper());

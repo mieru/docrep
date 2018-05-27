@@ -2,6 +2,7 @@ package docrep.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import docrep.service.document.DocumentService;
+import docrep.service.document.dto.DocumentAttachment;
 import docrep.service.document.dto.DocumentDTO;
 import docrep.service.document.dto.DocumentSearchDTO;
 import docrep.service.document.dto.DocumentToAdd;
@@ -19,6 +20,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Log4j
 @RestController
@@ -58,6 +61,21 @@ public class DocumentController {
         return documentService.genBarcode();
     }
 
+    @RequestMapping(value = "/api/document/attachments/{documentId}", method = RequestMethod.GET)
+    public Collection<DocumentAttachment> getAttachments(@PathVariable Integer documentId) throws Exception {
+        try (Stream<Path> paths = Files.walk(Paths.get("C:\\Users\\Czarek\\IdeaProjects\\mgr\\docrep-files\\" + documentId))) {
+            return paths
+                    .filter(Files::isRegularFile)
+                    .map(path -> {
+                        return DocumentAttachment.builder()
+                                .name(path.getFileName().toString())
+                                .build();
+                    }).collect(Collectors.toList());
+        }
+
+
+    }
+
     @RequestMapping(value = "/api/document/", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadFile(Authentication authentication, @RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "documentToadd", required = false) String formValues) throws IllegalStateException, IOException {
         ObjectMapper mapper = new ObjectMapper();
@@ -76,14 +94,12 @@ public class DocumentController {
 
     }
 
-    @RequestMapping("/file/")
-    public void downloadPDFResource(HttpServletRequest request,
-                                    HttpServletResponse response
-    ) {
-        Path file = Paths.get("C:\\Users\\Czarek\\IdeaProjects\\mgr\\docrep-files\\12\\", "testodt.odt");
+    @RequestMapping("/file/{documentId}/{filename}/")
+    public void downloadPDFResource(HttpServletResponse response, @PathVariable Integer documentId, @PathVariable String filename) {
+        Path file = Paths.get("C:\\Users\\Czarek\\IdeaProjects\\mgr\\docrep-files\\"+documentId+"\\", filename);
         if (Files.exists(file)) {
             response.setContentType("application/vnd.oasis.opendocument.text");
-            response.addHeader("Content-Disposition", "attachment; filename=" + "testodt.odt");
+            response.addHeader("Content-Disposition", "attachment; filename=" + filename);
             try {
                 Files.copy(file, response.getOutputStream());
                 response.getOutputStream().flush();
