@@ -5,6 +5,7 @@ import docrep.component.DocumentSessionStoreComponent;
 import docrep.component.ValidatorComponent;
 import docrep.dao.document.DocumentDAO;
 import docrep.db.tables.daos.AccountDao;
+import docrep.db.tables.daos.DocumentOpinionDao;
 import docrep.db.tables.daos.PersonDao;
 import docrep.db.tables.pojos.Account;
 import docrep.db.tables.pojos.Document;
@@ -13,6 +14,7 @@ import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.document.dto.DocumentDTO;
 import docrep.service.document.dto.DocumentSearchDTO;
 import docrep.service.document.dto.DocumentToAdd;
+import docrep.service.document.dto.DocumentToEdit;
 import docrep.service.document.mapper.DocumentMapper;
 import docrep.service.storagelocation.StorageLocationService;
 import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
@@ -37,6 +39,9 @@ public class DocumentService {
     AccountDao accountDao;
     @Autowired
     PersonDao personDao;
+    @Autowired
+    DocumentOpinionDao documentOpinionDao;
+
     @Autowired
     StorageLocationService storageLocationService;
 
@@ -117,6 +122,7 @@ public class DocumentService {
         barcode += nextDocIdStr;
         return barcode;
     }
+
     @Transactional
     public Integer addDocument(Authentication authentication, DocumentToAdd documentToAdd) {
         JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
@@ -125,7 +131,8 @@ public class DocumentService {
         Document document = new Document();
         document.setEditDate(new Timestamp(System.currentTimeMillis()));
         document.setOwnerId(account.getId());
-        document.setStorageLocationId(storageLocation.getId());
+
+        document.setStorageLocationId(documentToAdd.getStorageLocationId() != null ? documentToAdd.getStorageLocationId() : storageLocation.getId());
         document.setRegisterDate(new Timestamp(System.currentTimeMillis()));
         document.setBarcode(documentToAdd.getBarcode());
         document.setDescription(documentToAdd.getDescription());
@@ -134,5 +141,25 @@ public class DocumentService {
 
         documentDAO.insert(document);
         return document.getId();
+    }
+
+    @Transactional
+    public void update(Authentication authentication, DocumentToEdit documentToEdit) throws Exception {
+
+        Document document = documentDAO.findById(documentToEdit.getId());
+        document.setEditDate(new Timestamp(System.currentTimeMillis()));
+        document.setStorageLocationId(documentToEdit.getStorageLocationId());
+        document.setDescription(documentToEdit.getDescription());
+        document.setNumber(documentToEdit.getNumber());
+        document.setTitle(documentToEdit.getTitle());
+
+        documentDAO.update(document);
+    }
+
+    public void deleteDocument(Integer documentId) {
+        documentOpinionDao.fetchByDocumentId(documentId).stream().forEach(documentOpinion -> {
+            documentOpinionDao.delete(documentOpinion);
+        });
+        documentDAO.deleteById(documentId);
     }
 }

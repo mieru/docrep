@@ -5,11 +5,12 @@ import lombok.Data;
 
 @Data
 @Builder
-public class DocumentToAdd {
+public class DocumentToEdit {
+    Integer id;
     String title;
     String number;
-    String barcode;
-    String description;
     Integer storageLocationId;
+    String description;
 
+    String opinion;
 }

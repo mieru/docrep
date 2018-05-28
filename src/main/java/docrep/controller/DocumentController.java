@@ -1,11 +1,9 @@
 package docrep.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import docrep.service.document.DocumentOpinionService;
 import docrep.service.document.DocumentService;
-import docrep.service.document.dto.DocumentAttachment;
-import docrep.service.document.dto.DocumentDTO;
-import docrep.service.document.dto.DocumentSearchDTO;
-import docrep.service.document.dto.DocumentToAdd;
+import docrep.service.document.dto.*;
 import lombok.extern.log4j.Log4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -31,9 +29,17 @@ public class DocumentController {
     @Autowired
     DocumentService documentService;
 
+    @Autowired
+    DocumentOpinionService documentOpinionService;
+
     @RequestMapping(value = "/api/document/search", method = RequestMethod.POST)
     public Collection<DocumentDTO> searchDocuments(@RequestBody DocumentSearchDTO documentSearchDTO) throws Exception {
         return documentService.searchDocuments(documentSearchDTO);
+    }
+
+    @RequestMapping(value = "/api/document/{documentId}/opinions", method = RequestMethod.GET)
+    public Collection<DocumentOpinionDTO> getDocumentOpinionsByDocumentID(@PathVariable Integer documentId) throws Exception {
+        return documentOpinionService.getOpinionByDocumentId(documentId);
     }
 
     @RequestMapping(value = "/api/document/search/all", method = RequestMethod.POST)
@@ -64,8 +70,7 @@ public class DocumentController {
     @RequestMapping(value = "/api/document/attachments/{documentId}", method = RequestMethod.GET)
     public Collection<DocumentAttachment> getAttachments(@PathVariable Integer documentId) throws Exception {
         try (Stream<Path> paths = Files.walk(Paths.get("C:\\Users\\Czarek\\IdeaProjects\\mgr\\docrep-files\\" + documentId))) {
-            return paths
-                    .filter(Files::isRegularFile)
+            return paths.filter(Files::isRegularFile)
                     .map(path -> {
                         return DocumentAttachment.builder()
                                 .name(path.getFileName().toString())
@@ -76,23 +81,56 @@ public class DocumentController {
 
     }
 
+    @RequestMapping(value = "/api/document/{documentId}", method = RequestMethod.DELETE)
+    public void addDocument(@PathVariable Integer documentId) throws IllegalStateException, IOException {
+       documentService.deleteDocument(documentId);
+    }
+
+
     @RequestMapping(value = "/api/document/", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public void uploadFile(Authentication authentication, @RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "documentToadd", required = false) String formValues) throws IllegalStateException, IOException {
+    public void addDocument(Authentication authentication, @RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "documentToadd", required = false) String formValues) throws IllegalStateException, IOException {
         ObjectMapper mapper = new ObjectMapper();
         DocumentToAdd documentToAdd = mapper.readValue(formValues, DocumentToAdd.class);
         Integer documentId = documentService.addDocument(authentication, documentToAdd);
         final Path path = Paths.get("C:\\Users\\Czarek\\IdeaProjects\\mgr\\docrep-files\\" + documentId);
 
-        try {
-            if (!Files.exists(path)) {
-                Files.createDirectories(path);
+        if(file != null){
+            try {
+                if (!Files.exists(path)) {
+                    Files.createDirectories(path);
+                }
+                Files.copy(file.getInputStream(), path.resolve(file.getOriginalFilename()));
+            } catch (Exception e) {
+                Files.delete(path);
             }
-            Files.copy(file.getInputStream(), path.resolve(file.getOriginalFilename()));
-        } catch (Exception e) {
-            Files.delete(path);
         }
 
     }
+
+    @RequestMapping(value = "/api/document/", method = RequestMethod.PUT, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void editDocument(Authentication authentication, @RequestParam(value = "file", required = false) MultipartFile file, @RequestParam(value = "documentToEdit", required = false) String formValues) throws Exception {
+        ObjectMapper mapper = new ObjectMapper();
+        DocumentToEdit documentToEdit = mapper.readValue(formValues, DocumentToEdit.class);
+
+        documentService.update(authentication, documentToEdit);
+        if(documentToEdit.getOpinion() != null)
+        documentOpinionService.addOpinion(authentication,documentToEdit);
+        final Path path = Paths.get("C:\\Users\\Czarek\\IdeaProjects\\mgr\\docrep-files\\" + documentToEdit.getId());
+
+      if(file != null){
+          try {
+              if (!Files.exists(path)) {
+                  Files.createDirectories(path);
+              }
+              Files.copy(file.getInputStream(), path.resolve(file.getOriginalFilename()));
+          } catch (Exception e) {
+              Files.delete(path);
+          }
+      }
+
+
+    }
+
 
     @RequestMapping("/file/{documentId}/{filename}/")
     public void downloadPDFResource(HttpServletResponse response, @PathVariable Integer documentId, @PathVariable String filename) {

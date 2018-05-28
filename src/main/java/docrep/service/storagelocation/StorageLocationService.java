@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class StorageLocationService {
@@ -101,4 +102,10 @@ public class StorageLocationService {
             }
             return storageLocation;
         }
+
+    public List<StorageLocationDTO> getAllStorageLocations() {
+        return storageLocationDao.findAll().stream()
+                .map(StorageLocationMapper::mapStorageLocationToStorageLocationDto)
+                .collect(Collectors.toList());
+    }
 }

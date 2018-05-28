@@ -33,6 +33,12 @@ public class DaoConfiguration {
 
     @Bean
     @DbProfile
+    DocumentOpinionDao documentOpinionDao() {
+        return new DocumentOpinionDao(dslContext.configuration());
+    }
+
+    @Bean
+    @DbProfile
     PersonDao personDao() {
         return new PersonDao(dslContext.configuration());
     }
