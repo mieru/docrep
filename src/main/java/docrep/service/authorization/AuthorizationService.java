@@ -71,12 +71,12 @@ public class AuthorizationService {
     private void addContactsForPerson(List<ContactDTO> contacts, Integer personId) {
         if (contacts == null || contacts.size() == 0) return;
         contactDao.insert(contacts.stream()
-                .map(ContactMapper::mapContactDTOToContact)
+                .map(contactDTO -> ContactMapper.mapContactDTOToContact(contactDTO,null))
                 .peek(contact -> contact.setPersonId(personId)).collect(Collectors.toList()));
     }
 
     private Integer addAccount(AccountDTO accountDTO, Integer personId) {
-        Account account = AccountMapper.mapAccountDTOToAccount(accountDTO);
+        Account account = AccountMapper.mapAccountDTOToAccount(accountDTO, null);
         account.setPersonId(personId);
         account.setPassword(bCryptPasswordEncoder.encode(accountDTO.getPassword()));
         account.setStatus("ACTIVE");
@@ -85,14 +85,14 @@ public class AuthorizationService {
     }
 
     private Integer addPerson(AccountDTO accountDTO, Integer addressId) {
-        Person person = PersonMapper.mapPersonDTOToPerson(accountDTO.getPerson());
+        Person person = PersonMapper.mapPersonDTOToPerson(accountDTO.getPerson(), null);
         person.setAddressId(addressId);
         personDao.insert(person);
         return person.getId();
     }
 
     private Integer addAddress(AccountDTO accountDTO) {
-        Address address = AddressMapper.mapAddresDTOToAddres(accountDTO.getPerson().getAddress());
+        Address address = AddressMapper.mapAddresDTOToAddres(accountDTO.getPerson().getAddress(), null);
         addressDao.insert(address);
         return address.getId();
     }

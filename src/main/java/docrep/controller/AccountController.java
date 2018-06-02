@@ -4,7 +4,9 @@ import docrep.service.account.AccountService;
 import docrep.service.authorization.dto.AccountDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -25,5 +27,19 @@ public class AccountController {
     public List<AccountDTO> getAccountInformationForLoggedUser(){
         return accountService.getAllAccount();
     }
+
+
+    @RequestMapping(value = "/account/" , method = RequestMethod.PUT)
+    public void updateAccount(@RequestBody AccountDTO accountDTO){
+        accountService.update(accountDTO);
+    }
+
+    @RequestMapping(value = "/account/delete" , method = RequestMethod.POST)
+    public void deleteAccount(@RequestBody AccountDTO accountDTO){
+        accountService.delete(accountDTO);
+    }
+
+
+
 
 }

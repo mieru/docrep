@@ -10,15 +10,18 @@ import docrep.db.tables.pojos.Address;
 import docrep.db.tables.pojos.Contact;
 import docrep.db.tables.pojos.Person;
 import docrep.service.address.dto.AddressDTO;
+import docrep.service.address.mapper.AddressMapper;
 import docrep.service.authorization.dto.AccountDTO;
+import docrep.service.authorization.mapper.AccountMapper;
 import docrep.service.contact.dto.ContactDTO;
+import docrep.service.contact.mapper.ContactMapper;
 import docrep.service.person.dto.PersonDTO;
+import docrep.service.person.mapper.PersonMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +35,8 @@ public class AccountService {
     AddressDao addressDao;
     @Autowired
     ContactDao contactDao;
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
     public AccountDTO getAccountInfo(Authentication authentication) {
@@ -47,12 +52,15 @@ public class AccountService {
                 .lastLoginDate(account.getLastLoginDate() != null ? account.getLastLoginDate().toLocaleString() : "")
                 .status(account.getStatus())
                 .person(PersonDTO.builder()
-                        .contacts(contacts.stream().map(contact -> {return ContactDTO.builder()
-                                .description(contact.getDescription())
-                                .type(contact.getType())
-                                .value(contact.getValue())
-                                .regexp(contact.getRegexp())
-                                .build();})
+                        .contacts(contacts.stream().map(contact -> {
+                            return ContactDTO.builder()
+                                    .description(contact.getDescription())
+                                    .type(contact.getType())
+                                    .value(contact.getValue())
+                                    .regexp(contact.getRegexp())
+                                    .personId(contact.getPersonId())
+                                    .build();
+                        })
                                 .collect(Collectors.toList()))
                         .address(AddressDTO.builder()
                                 .buildingNumber(address.getBuildingNumber())
@@ -73,7 +81,7 @@ public class AccountService {
     }
 
     public List<AccountDTO> getAllAccount() {
-        return  accountDao.findAll().stream()
+        return accountDao.findAll().stream()
                 .map(account -> {
                     Person person = personDao.fetchOneById(account.getPersonId());
                     Address address = addressDao.fetchOneById(person.getAddressId());
@@ -84,12 +92,15 @@ public class AccountService {
                             .lastLoginDate(account.getLastLoginDate() != null ? account.getLastLoginDate().toLocaleString() : "")
                             .status(account.getStatus())
                             .person(PersonDTO.builder()
-                                    .contacts(contacts.stream().map(contact -> {return ContactDTO.builder()
-                                            .description(contact.getDescription())
-                                            .type(contact.getType())
-                                            .value(contact.getValue())
-                                            .regexp(contact.getRegexp())
-                                            .build();})
+                                    .contacts(contacts.stream().map(contact -> {
+                                        return ContactDTO.builder()
+                                                .description(contact.getDescription())
+                                                .type(contact.getType())
+                                                .value(contact.getValue())
+                                                .regexp(contact.getRegexp())
+                                                .personId(contact.getPersonId())
+                                                .build();
+                                    })
                                             .collect(Collectors.toList()))
                                     .address(AddressDTO.builder()
                                             .buildingNumber(address.getBuildingNumber())
@@ -108,5 +119,31 @@ public class AccountService {
                                     .build())
                             .build();
                 }).collect(Collectors.toList());
+    }
+
+    public void update(AccountDTO accountDTO) {
+        Account account = accountDao.fetchOneByUsername(accountDTO.getUsername());
+        Person person = personDao.fetchOneById(account.getPersonId());
+        Address address = addressDao.fetchOneById(person.getAddressId());
+        List<Contact> contacts = contactDao.fetchByPersonId(person.getId());
+
+        addressDao.update(AddressMapper.mapAddresDTOToAddres(accountDTO.getPerson().getAddress(),address));
+        personDao.update(PersonMapper.mapPersonDTOToPerson(accountDTO.getPerson(),person));
+        accountDTO.getPerson().getContacts().stream().forEach(contactDTO -> {
+            contactDao.update(ContactMapper.mapContactDTOToContact(contactDTO, contacts.stream()
+                    .filter(contact -> contact.getId().equals(contactDTO.getId())).findAny().get()));
+        });
+        if (accountDTO.getPassword() != null)
+            accountDTO.setPassword(bCryptPasswordEncoder.encode(accountDTO.getPassword()));
+        accountDao.update(AccountMapper.mapAccountDTOToAccount(accountDTO,account));
+    }
+
+    public void delete(AccountDTO accountDTO) {
+        addressDao.deleteById(accountDTO.getPerson().getAddress().getId());
+        accountDTO.getPerson().getContacts().stream().forEach(contactDTO -> {
+            contactDao.deleteById(contactDTO.getId());
+        });
+        personDao.deleteById(accountDTO.getPerson().getId());
+        accountDao.deleteById(accountDTO.getId());
     }
 }

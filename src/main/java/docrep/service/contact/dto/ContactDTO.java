@@ -17,4 +17,5 @@ public class ContactDTO {
     private String  description;
     @NotNull
     private String  value;
+    private Integer  personId;
 }
