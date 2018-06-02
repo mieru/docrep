@@ -34,12 +34,12 @@ public class AccountController {
     public void updateAccount(@RequestBody AccountDTO accountDTO){
         accountService.update(accountDTO);
     }
-    @RequestMapping(value = "/account/" , method = RequestMethod.POST)
+    @RequestMapping(value = "/account/changePassword" , method = RequestMethod.POST)
     public void addAccount(@RequestBody ChangePasswordDTO changePasswordDTO, Authentication authentication){
         accountService.changePassword(changePasswordDTO, authentication);
     }
 
-    @RequestMapping(value = "/account/changePassword" , method = RequestMethod.POST)
+    @RequestMapping(value = "/account/" , method = RequestMethod.POST)
     public void addAccount(@RequestBody AccountDTO accountDTO){
         accountService.add(accountDTO);
     }

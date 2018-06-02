@@ -74,12 +74,12 @@ public class DocumentService {
 
     public void addToClipboard(Authentication authentication, DocumentDTO documentDTO) {
         JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
-        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getName());
+        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getUsername());
         if (documentClipboard == null) {
             documentClipboard = new HashSet<>();
         }
         documentClipboard.add(documentDTO.getId());
-        DocumentSessionStoreComponent.getUsersDocumentStore().put(user.getName(), documentClipboard);
+        DocumentSessionStoreComponent.getUsersDocumentStore().put(user.getUsername(), documentClipboard);
     }
 
     @Transactional
@@ -186,7 +186,7 @@ public class DocumentService {
 
     public Collection<DocumentDTO> getAllFromClipboard(Authentication authentication) {
         JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
-        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getName());
+        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getUsername());
         if (documentClipboard != null)
             return documentClipboard.stream()
                     .map(documentDAO::fetchOneById)
@@ -210,7 +210,7 @@ public class DocumentService {
 
     public void deleteFromClipboard(Authentication authentication, Integer documentId) {
         JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
-        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getName());
+        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getUsername());
         documentClipboard.remove(documentId);
     }
 }
