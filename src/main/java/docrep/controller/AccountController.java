@@ -1,6 +1,7 @@
 package docrep.controller;
 
 import docrep.service.account.AccountService;
+import docrep.service.account.dto.ChangePasswordDTO;
 import docrep.service.authorization.dto.AccountDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -32,6 +33,15 @@ public class AccountController {
     @RequestMapping(value = "/account/" , method = RequestMethod.PUT)
     public void updateAccount(@RequestBody AccountDTO accountDTO){
         accountService.update(accountDTO);
+    }
+    @RequestMapping(value = "/account/" , method = RequestMethod.POST)
+    public void addAccount(@RequestBody ChangePasswordDTO changePasswordDTO, Authentication authentication){
+        accountService.changePassword(changePasswordDTO, authentication);
+    }
+
+    @RequestMapping(value = "/account/changePassword" , method = RequestMethod.POST)
+    public void addAccount(@RequestBody AccountDTO accountDTO){
+        accountService.add(accountDTO);
     }
 
     @RequestMapping(value = "/account/delete" , method = RequestMethod.POST)

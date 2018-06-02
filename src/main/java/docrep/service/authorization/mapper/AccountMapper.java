@@ -18,7 +18,6 @@ public class AccountMapper {
         if(accountDTO.getId() != null)
             account.setId(accountDTO.getId());
         account.setUsername(accountDTO.getUsername() != null ? accountDTO.getUsername(): account.getUsername());
-        account.setLastLoginDate(accountDTO.getLastLoginDate() != null ?Timestamp.valueOf(accountDTO.getLastLoginDate()): account.getLastLoginDate());
         account.setPassword(accountDTO.getPassword() != null ? accountDTO.getPassword() : account.getPassword());
         account.setStatus(accountDTO.getStatus() != null ? accountDTO.getStatus() : account.getStatus());
         return account;

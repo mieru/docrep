@@ -9,6 +9,7 @@ import docrep.db.tables.pojos.Account;
 import docrep.db.tables.pojos.Address;
 import docrep.db.tables.pojos.Contact;
 import docrep.db.tables.pojos.Person;
+import docrep.service.account.dto.ChangePasswordDTO;
 import docrep.service.address.dto.AddressDTO;
 import docrep.service.address.mapper.AddressMapper;
 import docrep.service.authorization.dto.AccountDTO;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,23 +123,24 @@ public class AccountService {
                 }).collect(Collectors.toList());
     }
 
+    @Transactional
     public void update(AccountDTO accountDTO) {
         Account account = accountDao.fetchOneByUsername(accountDTO.getUsername());
         Person person = personDao.fetchOneById(account.getPersonId());
         Address address = addressDao.fetchOneById(person.getAddressId());
-        List<Contact> contacts = contactDao.fetchByPersonId(person.getId());
 
-        addressDao.update(AddressMapper.mapAddresDTOToAddres(accountDTO.getPerson().getAddress(),address));
-        personDao.update(PersonMapper.mapPersonDTOToPerson(accountDTO.getPerson(),person));
+
+        addressDao.update(AddressMapper.mapAddresDTOToAddres(accountDTO.getPerson().getAddress(), address));
+        personDao.update(PersonMapper.mapPersonDTOToPerson(accountDTO.getPerson(), person));
         accountDTO.getPerson().getContacts().stream().forEach(contactDTO -> {
-            contactDao.update(ContactMapper.mapContactDTOToContact(contactDTO, contacts.stream()
-                    .filter(contact -> contact.getId().equals(contactDTO.getId())).findAny().get()));
+            contactDao.update(ContactMapper.mapContactDTOToContact(contactDTO, contactDao.fetchOneById(contactDTO.getId())));
         });
         if (accountDTO.getPassword() != null)
             accountDTO.setPassword(bCryptPasswordEncoder.encode(accountDTO.getPassword()));
-        accountDao.update(AccountMapper.mapAccountDTOToAccount(accountDTO,account));
+        accountDao.update(AccountMapper.mapAccountDTOToAccount(accountDTO, account));
     }
 
+    @Transactional
     public void delete(AccountDTO accountDTO) {
         addressDao.deleteById(accountDTO.getPerson().getAddress().getId());
         accountDTO.getPerson().getContacts().stream().forEach(contactDTO -> {
@@ -145,5 +148,30 @@ public class AccountService {
         });
         personDao.deleteById(accountDTO.getPerson().getId());
         accountDao.deleteById(accountDTO.getId());
+    }
+
+    @Transactional
+    public void add(AccountDTO accountDTO) {
+        accountDTO.setPassword(bCryptPasswordEncoder.encode(accountDTO.getPassword()));
+        Address address = new Address();
+        addressDao.insert(address);
+
+        Person person = new Person();
+        person.setAddressId(address.getId());
+        personDao.insert(person);
+
+        Account account = AccountMapper.mapAccountDTOToAccount(accountDTO, null);
+
+        account.setStatus("ACTIVE");
+        account.setPersonId(person.getId());
+        accountDao.insert(account);
+    }
+    @Transactional
+    public void changePassword(ChangePasswordDTO changePasswordDTO, Authentication authentication) {
+        changePasswordDTO.setNewPassword(bCryptPasswordEncoder.encode(changePasswordDTO.getNewPassword()));
+        JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
+        Account account = accountDao.fetchOneByUsername(user.getUsername());
+        account.setPassword(changePasswordDTO.getNewPassword());
+        accountDao.update(account);
     }
 }
