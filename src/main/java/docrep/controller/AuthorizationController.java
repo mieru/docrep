@@ -30,6 +30,7 @@ public class AuthorizationController {
     @RequestMapping(value = "/account/login", method = RequestMethod.PUT)
     public ResponseEntity<String> checkLoginData(@RequestBody AuthAccountDTO authAccountDTO) throws Exception {
         boolean isAuthorized = authorizationService.checkLoginDataAndGenerateToken(authAccountDTO);
+        if(isAuthorized) authorizationService.updateLastLoginDate(authAccountDTO);
         return isAuthorized ? generateResponseWithToken(authAccountDTO) : new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
 
     }

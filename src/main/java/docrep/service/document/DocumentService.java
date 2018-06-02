@@ -182,5 +182,35 @@ public class DocumentService {
                     return DocumentMapper.mapDocumentToDocumentDTO(document, person, storageLocationComplete);
                 })
                 .collect(Collectors.toList());
-        }
+    }
+
+    public Collection<DocumentDTO> getAllFromClipboard(Authentication authentication) {
+        JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
+        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getName());
+        if (documentClipboard != null)
+            return documentClipboard.stream()
+                    .map(documentDAO::fetchOneById)
+                    .map(document -> {
+                        Account account = null;
+                        Person person = null;
+                        CompleteStorageLocationStructureDTO storageLocation = null;
+                        try {
+                            account = accountDao.fetchOneById(document.getOwnerId());
+                            person = personDao.fetchOneById(account.getPersonId());
+                            storageLocation = storageLocationService.getCompleteStructureStorageLocationById(document.getStorageLocationId());
+                        } catch (Exception e) {
+                            throw new RuntimeException(e);
+                        }
+                        return DocumentMapper.mapDocumentToDocumentDTO(document, person, storageLocation);
+                    })
+                    .collect(Collectors.toList());
+        else
+            return Collections.emptyList();
+    }
+
+    public void deleteFromClipboard(Authentication authentication, Integer documentId) {
+        JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
+        HashSet<Integer> documentClipboard = DocumentSessionStoreComponent.getUsersDocumentStore().get(user.getName());
+        documentClipboard.remove(documentId);
+    }
 }

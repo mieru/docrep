@@ -2,7 +2,6 @@ package docrep.service.document.mapper;
 
 import docrep.db.tables.pojos.Document;
 import docrep.db.tables.pojos.Person;
-import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.document.dto.DocumentDTO;
 import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
 

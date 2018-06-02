@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -42,7 +44,7 @@ public class AccountService {
         return AccountDTO.builder()
                 .id(account.getId())
                 .username(account.getUsername())
-                .lastLoginDate(account.getLastLoginDate())
+                .lastLoginDate(account.getLastLoginDate() != null ? account.getLastLoginDate().toLocaleString() : "")
                 .status(account.getStatus())
                 .person(PersonDTO.builder()
                         .contacts(contacts.stream().map(contact -> {return ContactDTO.builder()
@@ -68,5 +70,43 @@ public class AccountService {
                         .pesel(person.getPesel())
                         .build())
                 .build();
+    }
+
+    public List<AccountDTO> getAllAccount() {
+        return  accountDao.findAll().stream()
+                .map(account -> {
+                    Person person = personDao.fetchOneById(account.getPersonId());
+                    Address address = addressDao.fetchOneById(person.getAddressId());
+                    List<Contact> contacts = contactDao.fetchByPersonId(person.getId());
+                    return AccountDTO.builder()
+                            .id(account.getId())
+                            .username(account.getUsername())
+                            .lastLoginDate(account.getLastLoginDate() != null ? account.getLastLoginDate().toLocaleString() : "")
+                            .status(account.getStatus())
+                            .person(PersonDTO.builder()
+                                    .contacts(contacts.stream().map(contact -> {return ContactDTO.builder()
+                                            .description(contact.getDescription())
+                                            .type(contact.getType())
+                                            .value(contact.getValue())
+                                            .regexp(contact.getRegexp())
+                                            .build();})
+                                            .collect(Collectors.toList()))
+                                    .address(AddressDTO.builder()
+                                            .buildingNumber(address.getBuildingNumber())
+                                            .postalCode(address.getPostalCode())
+                                            .city(address.getCity())
+                                            .premisesNumber(address.getPremisesNumber())
+                                            .streetName(address.getStreetName())
+                                            .id(address.getId())
+                                            .build())
+                                    .firstname(person.getFirstname())
+                                    .id(person.getId())
+                                    .idNumber(person.getIdNumber())
+                                    .jobPosition(person.getJobPosition())
+                                    .lastname(person.getLastname())
+                                    .pesel(person.getPesel())
+                                    .build())
+                            .build();
+                }).collect(Collectors.toList());
     }
 }

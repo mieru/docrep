@@ -18,7 +18,7 @@ public class AccountDTO {
     private String username;
     @NotNull
     private String password;
-    private Timestamp lastLoginDate;
+    private String lastLoginDate;
     private String status;
     @NotNull
     @Valid

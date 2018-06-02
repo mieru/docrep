@@ -62,6 +62,16 @@ public class DocumentController {
         documentService.addToClipboard(authentication, documentDTO);
     }
 
+    @RequestMapping(value = "/api/document/clipboard/{documentId}", method = RequestMethod.DELETE)
+    public void addToClipboard(Authentication authentication, @PathVariable Integer documentId) throws Exception {
+        documentService.deleteFromClipboard(authentication, documentId);
+    }
+
+    @RequestMapping(value = "/api/document/clipboard", method = RequestMethod.GET)
+    public Collection<DocumentDTO> getAllFromClipboard(Authentication authentication) throws Exception {
+       return documentService.getAllFromClipboard(authentication);
+    }
+
     @RequestMapping(value = "/api/document/take", method = RequestMethod.POST)
     public void takeDocument(Authentication authentication, @RequestBody DocumentDTO documentDTO) throws Exception {
         documentService.takeDocument(authentication, documentDTO);

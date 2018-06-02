@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.ValidationException;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,5 +95,11 @@ public class AuthorizationService {
         Address address = AddressMapper.mapAddresDTOToAddres(accountDTO.getPerson().getAddress());
         addressDao.insert(address);
         return address.getId();
+    }
+
+    public void updateLastLoginDate(AuthAccountDTO authAccountDTO) {
+        Account account = accountDao.fetchOneByUsername(authAccountDTO.getUsername());
+        account.setLastLoginDate(new Timestamp(System.currentTimeMillis()));
+        accountDao.update(account);
     }
 }
