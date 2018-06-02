@@ -25,7 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -162,4 +164,23 @@ public class DocumentService {
         });
         documentDAO.deleteById(documentId);
     }
+
+    public Collection<DocumentDTO> findForAccount(Authentication authentication) {
+        JwtAuthenticatedUser user = (JwtAuthenticatedUser) authentication.getPrincipal();
+        Account account = accountDao.fetchOneByUsername(user.getUsername());
+        StorageLocation storageLocation = storageLocationService.getStorageLocationByAccountId(account.getId());
+        return documentDAO.fetchByStorageLocationId(storageLocation.getId()).stream()
+                .map(document -> {
+                    Person person = null;
+                    CompleteStorageLocationStructureDTO storageLocationComplete = null;
+                    try {
+                        person = personDao.fetchOneById(account.getPersonId());
+                        storageLocationComplete = storageLocationService.getCompleteStructureStorageLocationById(document.getStorageLocationId());
+                    } catch (Exception e) {
+                        throw new RuntimeException(e);
+                    }
+                    return DocumentMapper.mapDocumentToDocumentDTO(document, person, storageLocationComplete);
+                })
+                .collect(Collectors.toList());
+        }
 }

@@ -3,6 +3,7 @@ package docrep.controller;
 import docrep.service.storagelocation.StorageLocationService;
 import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
 import docrep.service.storagelocation.dto.StorageLocationDTO;
+import docrep.service.storagelocation.dto.StrageLocationTreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,6 +34,11 @@ public class StorageLocationController {
     @RequestMapping(value = "/storagelocation/all", method = RequestMethod.GET)
     public List<StorageLocationDTO> getAllStorageLocations() throws Exception {
         return storageLocationService.getAllStorageLocations();
+    }
+
+    @RequestMapping(value = "/storagelocation/tree", method = RequestMethod.GET)
+    public List<StrageLocationTreeNode> getAllStorageLocationsAsTree() throws Exception {
+        return storageLocationService.getAllStorageLocationsAsTree();
     }
 
     @RequestMapping(value = "/storagelocation/{storageLocationId}/", method = RequestMethod.DELETE)

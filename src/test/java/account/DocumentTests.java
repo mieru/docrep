@@ -3,7 +3,9 @@ package account;
 import docrep.component.ValidatorComponent;
 import docrep.dao.document.DocumentDAO;
 import docrep.db.tables.daos.AccountDao;
+import docrep.db.tables.daos.DocumentOpinionDao;
 import docrep.db.tables.daos.PersonDao;
+import docrep.db.tables.daos.StorageLocationDao;
 import docrep.db.tables.pojos.Account;
 import docrep.db.tables.pojos.Document;
 import docrep.db.tables.pojos.Person;
@@ -54,8 +56,11 @@ public class DocumentTests {
     @MockBean
     PersonDao personDao;
     @MockBean
+    StorageLocationDao storageLocationDao;
+    @MockBean
     StorageLocationService storageLocationService;
-
+    @MockBean
+    DocumentOpinionDao documentOpinionDao;
 
     @Test(expected = Exception.class)
     public void shouldThrowExceptionWhenAllSearchFieldsAreNull() throws Exception {

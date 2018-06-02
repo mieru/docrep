@@ -52,6 +52,11 @@ public class DocumentController {
         return documentService.searchFuzzy(searchPhrase);
     }
 
+    @RequestMapping(value = "/api/document/forLoggedAccount", method = RequestMethod.GET)
+    public Collection<DocumentDTO> findDocumentByAccountIdAsStorageLocation(Authentication authentication) throws Exception {
+        return documentService.findForAccount(authentication);
+    }
+
     @RequestMapping(value = "/api/document/clipboard", method = RequestMethod.POST)
     public void addToClipboard(Authentication authentication, @RequestBody DocumentDTO documentDTO) throws Exception {
         documentService.addToClipboard(authentication, documentDTO);

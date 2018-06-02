@@ -2,6 +2,7 @@ package docrep.service.storagelocation.mapper;
 
 import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.storagelocation.dto.StorageLocationDTO;
+import docrep.service.storagelocation.dto.StrageLocationTreeNode;
 import docrep.service.storagelocation.enums.StorageLocationType;
 
 public class StorageLocationMapper {
@@ -43,4 +44,7 @@ public class StorageLocationMapper {
             storageLocation.setType(storageLocationDTO.getType().toString());
         return storageLocation;
     }
+
+
+
 }

@@ -9,6 +9,7 @@ import docrep.db.tables.pojos.Person;
 import docrep.db.tables.pojos.StorageLocation;
 import docrep.service.storagelocation.dto.CompleteStorageLocationStructureDTO;
 import docrep.service.storagelocation.dto.StorageLocationDTO;
+import docrep.service.storagelocation.dto.StrageLocationTreeNode;
 import docrep.service.storagelocation.enums.StorageLocationType;
 import docrep.service.storagelocation.mapper.StorageLocationMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -108,4 +109,24 @@ public class StorageLocationService {
                 .map(StorageLocationMapper::mapStorageLocationToStorageLocationDto)
                 .collect(Collectors.toList());
     }
+
+    public StorageLocation getStorageLocationByAccountId(Integer accountId) {
+        return storageLocationDao.fetchByAccountId(accountId).get(0);
+    }
+
+    public List<StrageLocationTreeNode> getAllStorageLocationsAsTree() {
+        return fillTreeStructure(storageLocationDao.findAll().stream()
+                .filter(storageLocation -> storageLocation.getSuperiorStorageLocId() == null)
+                .collect(Collectors.toList()));
+    }
+
+    public List<StrageLocationTreeNode> fillTreeStructure(List<StorageLocation> list) {
+        return list.stream()
+                .map(storageLocation -> {return StrageLocationTreeNode.builder()
+                        .label(storageLocation.getName())
+                        .data(storageLocation.getId().toString())
+                        .children(fillTreeStructure(storageLocationDao.fetchBySuperiorStorageLocId(storageLocation.getId())))
+                        .build();}).collect(Collectors.toList());
+    }
+
 }

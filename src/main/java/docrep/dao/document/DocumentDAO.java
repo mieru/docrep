@@ -25,6 +25,7 @@ public class DocumentDAO extends DocumentDao {
                         ,documentSearchDTO.getTitle() != null ? DOCUMENT.TITLE.eq(documentSearchDTO.getTitle()) : DSL.trueCondition()
                         ,documentSearchDTO.getDescription() != null ? DOCUMENT.DESCRIPTION.eq(documentSearchDTO.getDescription()) : DSL.trueCondition()
                         ,documentSearchDTO.getOwnerId() != null ? DOCUMENT.OWNER_ID.eq(documentSearchDTO.getOwnerId()) : DSL.trueCondition()
+                        ,documentSearchDTO.getStorageLocationId() != null ? DOCUMENT.STORAGE_LOCATION_ID.eq(documentSearchDTO.getStorageLocationId()) : DSL.trueCondition()
                         ,documentSearchDTO.getSearchDateFrom() != null ? DOCUMENT.REGISTER_DATE.ge(new Timestamp(documentSearchDTO.getSearchDateFrom().getTime())) : DSL.trueCondition()
                         ,documentSearchDTO.getSearchDateTo() != null ? DOCUMENT.REGISTER_DATE.le(new Timestamp(documentSearchDTO.getSearchDateTo().getTime())) : DSL.trueCondition()
                         ,documentSearchDTO.getNumber() != null ? DOCUMENT.NUMBER.eq(documentSearchDTO.getNumber()) : DSL.trueCondition())
